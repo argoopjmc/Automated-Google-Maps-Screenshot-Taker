@@ -5,6 +5,7 @@ import time
 import re
 import readline
 import xlrd
+from datetime import datetime 
 from PIL import Image
 
 def convertTuple(tup): 
@@ -162,7 +163,7 @@ else:
     fileName = ""
     print("Type an xlsx file")
 
-
+cur_timestamp = str(datetime.now().strftime('%Y-%m-%d %H.%M.%S'))
 driver = webdriver.Chrome()
 driver.maximize_window()
 school_urls = []
@@ -173,7 +174,13 @@ wb = xlrd.open_workbook(loc)
 sheet = wb.sheet_by_index(0) 
 sheet.cell_value(0, 0) 
 
+folder = "folder_" + cur_timestamp
 
+try:
+    os.makedirs(folder)
+except OSError:
+    pass
+os.chdir(folder)
 
 for i in range(sheet.nrows): 
     if(sheet.cell_value(i,2)!='' and sheet.cell_value(i,3)!='' and sheet.cell_value(i,2)!='lat' and sheet.cell_value(i,3)!='lon' ):
