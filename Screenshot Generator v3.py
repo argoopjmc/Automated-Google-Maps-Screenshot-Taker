@@ -193,7 +193,7 @@ readline.set_completer_delims(' \t\n;')
 readline.parse_and_bind("tab: complete")
 readline.set_completer(targetLoc.complete)
 command_input = input('$ Target')
-if(command_input[6:] == "savein" and command_input[:1] = "\"): 
+if(command_input[6:] == "savein" and command_input[:1] = "\" or command_input[-4:-3] != '.' and command_input[-5:-4] != "."): 
     saveHere = command_input.split(' ',1)[1]
     print(saveHere + " \nThe timestamped folder will be saved here.")
 else:
@@ -224,7 +224,7 @@ res_2 = [col_names.index(i) for i in col_names if subs_2 in i][0]
 # printing result  
 print ("All strings with given substring are with index : " + str(res_1) + " " + str(res_2))
 
-folder = "folder_" + cur_timestamp
+folder = saveHere + "folder_" + cur_timestamp
 
 try:
     os.makedirs(folder)
