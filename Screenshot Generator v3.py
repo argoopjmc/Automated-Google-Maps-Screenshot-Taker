@@ -193,7 +193,7 @@ readline.set_completer_delims(' \t\n;')
 readline.parse_and_bind("tab: complete")
 readline.set_completer(targetLoc.complete)
 command_input = input('$ Target')
-if(command_input[6:] == "savein" and command_input[:1] = '\'): 
+if(command_input[6:] == "savein" and command_input[:1] = "\"): 
     saveHere = command_input.split(' ',1)[1]
     print(saveHere + " \nThe timestamped folder will be saved here.")
 else:
