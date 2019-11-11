@@ -84,7 +84,7 @@ def fullpage_screenshot(driver, file):
 
 
   
-COMMANDS = ['input','use', 'genfrom' , 'takeshots']
+COMMANDS = ['input','use', 'genfrom' , 'takeshots'  ,'savein']
 RE_SPACE = re.compile('.*\s+$', re.M)
 test_var= ""
 class Completer(object):
@@ -143,8 +143,14 @@ class Completer(object):
         if not args:
             return self._complete_path('.')
         # treat the last arg as a path and complete it
+        return self._complete_path(args[-1]
+                                   
+    def complete_savein(self, args):
+        "Completions for the 'savein' command."
+        if not args:
+            return self._complete_path('.')
+        # treat the last arg as a path and complete it
         return self._complete_path(args[-1])
-
 
 
     def complete(self, text, state):
@@ -168,12 +174,12 @@ class Completer(object):
         results = [c + ' ' for c in COMMANDS if c.startswith(cmd)] + [None]
         return results[state]
 
-comp = Completer()
+sourceLoc = Completer()
 # we want to treat '/' as part of a word, so override the delimiters
 readline.set_completer_delims(' \t\n;')
 readline.parse_and_bind("tab: complete")
-readline.set_completer(comp.complete)
-command_input = input('$ ')
+readline.set_completer(sourceLoc.complete)
+command_input = input('$ Source ')
 if(command_input[-4:] == "xlsx"):
     fileName = command_input.split(' ',1)[1]
     print(fileName + " \nThis file will be used to generate the screenshots.")
@@ -181,6 +187,19 @@ else:
     fileName = ""
     print("Type an xlsx file")
 
+targetLoc = Completer()
+# we want to treat '/' as part of a word, so override the delimiters
+readline.set_completer_delims(' \t\n;')
+readline.parse_and_bind("tab: complete")
+readline.set_completer(targetLoc.complete)
+command_input = input('$ Target')
+if(command_input[6:] == "savein" and command_input[:1] = '\'):
+    saveHere = command_input.split(' ',1)[1]
+    print(saveHere + " \nThe timestamped folder will be saved here.")
+else:
+    saveHere = ""
+    print("Use savein to choose the destination")
+                                   
 cur_timestamp = str(datetime.now().strftime('%Y-%m-%d %H.%M.%S'))
 driver = webdriver.Chrome()
 driver.maximize_window()
