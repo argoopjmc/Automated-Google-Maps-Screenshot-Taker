@@ -3,13 +3,14 @@ from selenium import webdriver
 import os
 import time
 import re
+from colorama import init,Fore
 import readline
 import xlrd
 from datetime import datetime 
 from PIL import Image
 
 string_truncate = 0
-
+init(convert=True)
 def convertTuple(tup): 
     string = ''.join(str(tup)) 
     return string
@@ -180,28 +181,29 @@ sourceLoc = Completer()
 readline.set_completer_delims(' \t\n;')
 readline.parse_and_bind("tab: complete")
 readline.set_completer(sourceLoc.complete)
-command_input = input('$ Source ')
+command_input = input(Fore.YELLOW +'$ Source ')
 if(command_input[-4:] == "xlsx"):
     fileName = command_input.split(' ',1)[1]
-    print(fileName + " \nThis file will be used to generate the screenshots.")
+    print(Fore.GREEN + '' + fileName + " \nThis file will be used to generate the screenshots.")
 else:
     fileName = ""
-    print("Type an xlsx file")
+    print(Fore.RED +"Type an xlsx file")
 
 targetLoc = Completer()
 # we want to treat '/' as part of a word, so override the delimiters
 readline.set_completer_delims(' \t\n;')
 readline.parse_and_bind("tab: complete")
 readline.set_completer(targetLoc.complete)
-command_input = input('$ Target ')
+command_input = input(Fore.YELLOW+'$ Target ')
 print(len(command_input))
 if(command_input.split(' ',1)[0] == "savein" and command_input.endswith('\\')): 
     saveHere = command_input.split(' ',1)[1]
-    print(saveHere + " \nThe timestamped folder will be saved here.")
+    print(Fore.GREEN +saveHere + " \nThe timestamped folder will be saved here.")
 else:
     saveHere = ""
-    print("Not a valid destination. The folder will be saved in the same directory as the script.")
+    print(Fore.RED +"Not a valid destination. The folder will be saved in the same directory as the script.")
 
+print(Fore.CYAN)
 cur_timestamp = str(datetime.now().strftime('%Y-%m-%d %H.%M.%S'))
 driver = webdriver.Chrome()
 driver.maximize_window()
