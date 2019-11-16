@@ -228,9 +228,9 @@ subs_2 = 'lon'
 subs_3 = 'id'  
 # using list comprehension  
 # to get string with substring  
-res_1 = [col_names.index(i) for i in col_names if subs_1 in i][0]
-res_2 = [col_names.index(i) for i in col_names if subs_2 in i][0]
-res_3 = [col_names.index(i) for i in col_names if subs_3 in i][0]  
+res_1 = [col_names.index(i) for i in col_names if subs_1 in i.lower()][0]
+res_2 = [col_names.index(i) for i in col_names if subs_2 in i.lower()][0]
+res_3 = [col_names.index(i) for i in col_names if subs_3 in i.lower()][0]  
 # printing result  
 print ("All strings with given substring are with index : " + str(res_1) + " " + str(res_2))
 
