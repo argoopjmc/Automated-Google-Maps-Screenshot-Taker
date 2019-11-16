@@ -246,7 +246,7 @@ screenshots_taken = 0
 for i in range(sheet.nrows): 
     if(sheet.cell_value(i,res_1)!='' and sheet.cell_value(i,res_2)!='' and sheet.cell_value(i,res_1)!='lat' and sheet.cell_value(i,res_2)!='lon' ):
         print('\r')
-        school_urls.append("https://www.google.com/maps/place/" + str(sheet.cell_value(i, 2)) + "+"  + str(sheet.cell_value(i, 3)) + "/@"  + str(sheet.cell_value(i, 2)) + ","  + str(sheet.cell_value(i, 3)) + ",200m/data=!3m1!1e3!4m5!3m4!1s0x0:0x0!8m2!3d"+ str(sheet.cell_value(i, 2)) + "!4d" + str(sheet.cell_value(i, 3)))
+        school_urls.append("https://www.google.com/maps/place/" + str(sheet.cell_value(i, res_1)) + "+"  + str(sheet.cell_value(i, res_2)) + "/@"  + str(sheet.cell_value(i, res_1)) + ","  + str(sheet.cell_value(i, res_2)) + ",200m/data=!3m1!1e3!4m5!3m4!1s0x0:0x0!8m2!3d"+ str(sheet.cell_value(i, res_1)) + "!4d" + str(sheet.cell_value(i, res_2)))
         fileName_screenshots.append("screenshot_school_"+str(sheet.cell_value(i,0))+".png" )
         print(fileName_screenshots[i-1])
         print(school_urls[i-1])
