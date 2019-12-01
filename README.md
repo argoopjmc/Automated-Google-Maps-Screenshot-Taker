@@ -13,3 +13,4 @@ python -m pip install colorama --user
 python -m pip install pyreadline --user
 ```
 Do not forget do installl the chromedriver for your latest version of Google Chrome and set in the path variables.
+[![HitCount](http://hits.dwyl.io/argoopjmc/Automated-Google-Maps-Screenshot-Taker.svg)](http://hits.dwyl.io/argoopjmc/Automated-Google-Maps-Screenshot-Taker)
