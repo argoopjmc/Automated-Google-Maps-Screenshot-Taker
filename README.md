@@ -1,4 +1,6 @@
 # Automated-Google-Maps-Screenshot-Taker
+
+[![HitCount](http://hits.dwyl.io/argoopjmc/Automated-Google-Maps-Screenshot-Taker.svg)](http://hits.dwyl.io/argoopjmc/Automated-Google-Maps-Screenshot-Taker)
 Tool for generating large number of screenshots using selenium
 
 This tool can be used for generating a large quantity of screenshots (in this case Google Maps) from an xlsx file using a browser automation tool called Selenium. You can search for the file using autocompletion in the terminal and also use this feature to chose the destination folder for saving the timestamped folder containing the images. Please ensure that the file name/folder does not contain any spaces and the xlsx file contains all the heading in the first row otherwise you might face an issue while running the program.
@@ -13,4 +15,4 @@ python -m pip install colorama --user
 python -m pip install pyreadline --user
 ```
 Do not forget do installl the chromedriver for your latest version of Google Chrome and set in the path variables.
-[![HitCount](http://hits.dwyl.io/argoopjmc/Automated-Google-Maps-Screenshot-Taker.svg)](http://hits.dwyl.io/argoopjmc/Automated-Google-Maps-Screenshot-Taker)
+
