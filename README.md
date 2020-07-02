@@ -14,5 +14,5 @@ python -m pip install Pillow --user
 python -m pip install colorama --user
 python -m pip install pyreadline --user
 ```
-Do not forget do installl the chromedriver for your latest version of Google Chrome and set in the path variables.
+Do not forget do installl the [chromedriver](https://chromedriver.chromium.org/downloads) for your latest version of Google Chrome and set in the path variables.
 
