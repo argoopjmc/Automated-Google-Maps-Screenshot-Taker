@@ -15,76 +15,72 @@ init(convert=True)
 print(Fore.MAGENTA + "Created by Rahul Gupta. Contact rg119@ic.ac.uk for any feedback or issues.")
 print("Use the input, use, genfrom, takeshots commands to select the source and the savein command to select the target for saving the images")
 def convertTuple(tup): 
-    string = ''.join(str(tup)) 
-    return string
+    return ''.join(str(tup))
 
 def fullpage_screenshot(driver, file):
 
-        print("The process of taking a screenshot has started. Please wait ...")
+    print("The process of taking a screenshot has started. Please wait ...")
 
-        total_width = driver.execute_script("return document.body.offsetWidth")
-        total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
-        viewport_width = driver.execute_script("return document.body.clientWidth")
-        viewport_height = driver.execute_script("return window.innerHeight")
-        print("Total: ({0}, {1}), Viewport: ({2},{3})".format(total_width, total_height,viewport_width,viewport_height))
-        rectangles = []
+    total_width = driver.execute_script("return document.body.offsetWidth")
+    total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
+    viewport_width = driver.execute_script("return document.body.clientWidth")
+    viewport_height = driver.execute_script("return window.innerHeight")
+    print("Total: ({0}, {1}), Viewport: ({2},{3})".format(total_width, total_height,viewport_width,viewport_height))
+    rectangles = []
 
-        i = 0
-        while i < total_height:
-            ii = 0
-            top_height = i + viewport_height
+    i = 0
+    while i < total_height:
+        ii = 0
+        top_height = i + viewport_height
 
-            if top_height > total_height:
-                top_height = total_height
+        if top_height > total_height:
+            top_height = total_height
 
-            while ii < total_width:
-                top_width = ii + viewport_width
+        while ii < total_width:
+            top_width = ii + viewport_width
 
-                if top_width > total_width:
-                    top_width = total_width
+            if top_width > total_width:
+                top_width = total_width
 
-                print("Appending rectangle ({0},{1},{2},{3})".format(ii, i, top_width, top_height))
-                rectangles.append((ii, i, top_width,top_height))
+            print("Appending rectangle ({0},{1},{2},{3})".format(ii, i, top_width, top_height))
+            rectangles.append((ii, i, top_width,top_height))
 
-                ii = ii + viewport_width
+            ii += viewport_width
 
-            i = i + viewport_height
+        i += viewport_height
 
-        stitched_image = Image.new('RGB', (total_width, total_height))
-        previous = None
-        part = 0
+    stitched_image = Image.new('RGB', (total_width, total_height))
+    previous = None
+    for part, rectangle in enumerate(rectangles):
+        if previous is not None:
+            driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
+            time.sleep(2)
+            driver.execute_script("document.getElementById('topnav').setAttribute('style', 'position: absolute; top: 0px;');")
+            time.sleep(2)
+            print("Scrolled To ({0},{1})".format(rectangle[0], rectangle[1]))
+            time.sleep(2)
 
-        for rectangle in rectangles:
-            if not previous is None:
-                driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
-                time.sleep(2)
-                driver.execute_script("document.getElementById('topnav').setAttribute('style', 'position: absolute; top: 0px;');")
-                time.sleep(2)
-                print("Scrolled To ({0},{1})".format(rectangle[0], rectangle[1]))
-                time.sleep(2)
+        file_name = "part_{0}.png".format(part)
+        print("Capturing {0} ...".format(file_name))
 
-            file_name = "part_{0}.png".format(part)
-            print("Capturing {0} ...".format(file_name))
+        driver.get_screenshot_as_file(file_name)
+        screenshot = Image.open(file_name)
 
-            driver.get_screenshot_as_file(file_name)
-            screenshot = Image.open(file_name)
+        if rectangle[1] + viewport_height > total_height:
+            offset = (rectangle[0], total_height - viewport_height)
+        else:
+            offset = (rectangle[0], rectangle[1])
 
-            if rectangle[1] + viewport_height > total_height:
-                offset = (rectangle[0], total_height - viewport_height)
-            else:
-                offset = (rectangle[0], rectangle[1])
+        print("Adding to stitched image with offset ({0}, {1})".format(offset[0],offset[1]))
+        stitched_image.paste(screenshot, offset)
 
-            print("Adding to stitched image with offset ({0}, {1})".format(offset[0],offset[1]))
-            stitched_image.paste(screenshot, offset)
+        del screenshot
+        os.remove(file_name)
+        previous = rectangle
 
-            del screenshot
-            os.remove(file_name)
-            part = part + 1
-            previous = rectangle
-
-        stitched_image.save(file)
-        print("The screenshot has been taken. The screenshot for the next entry shall start shortly...")
-        return True
+    stitched_image.save(file)
+    print("The screenshot has been taken. The screenshot for the next entry shall start shortly...")
+    return True
 
 
 suggest = ""  
@@ -108,7 +104,7 @@ class Completer(object):
         if not path:
             return self._listdir('.')
         dirname, rest = os.path.split(path)
-        tmp = dirname if dirname else '.'
+        tmp = dirname or '.'
         res = [os.path.join(dirname, p)
                 for p in self._listdir(tmp) if p.startswith(rest)]
         # more than one match, or single match which does not exist (typo)
@@ -118,7 +114,7 @@ class Completer(object):
         if os.path.isdir(path):
             return [os.path.join(path, p) for p in self._listdir(path)]
         # exact file match terminates this completion
-        return [path + ' ']
+        return [f'{path} ']
 
     def complete_input(self, args):
         "Completions for the 'input' command."
@@ -164,7 +160,7 @@ class Completer(object):
         line = readline.get_line_buffer().split()
         # show all commands
         if not line:
-            return [c + ' ' for c in COMMANDS][state]
+            return [f'{c} ' for c in COMMANDS][state]
         # account for last argument ending in a space
         if RE_SPACE.match(buffer):
             line.append('')
@@ -172,11 +168,10 @@ class Completer(object):
         cmd = line[0].strip()
         if cmd in COMMANDS:
             impl = getattr(self, 'complete_%s' % cmd)
-            args = line[1:]      
-            if args:
+            if args := line[1:]:
                 return (impl(args) + [None])[state]
-            return [cmd + ' '][state]
-        results = [c + ' ' for c in COMMANDS if c.startswith(cmd)] + [None]
+            return [f'{cmd} '][state]
+        results = [f'{c} ' for c in COMMANDS if c.startswith(cmd)] + [None]
         return results[state]
 
 sourceLoc = Completer()
@@ -187,20 +182,24 @@ readline.set_completer(sourceLoc.complete)
 print("Suggested .xlsx files for use in this folder:  \n")
 converted_suggest = map(str, glob.glob('./*.xlsx'))
 print('\n'.join(s.strip('.\\') for s in converted_suggest))
-command_input = input(Fore.YELLOW +'$ Source ')
-if(command_input[-4:] == "xlsx"):
+command_input = input(f'{Fore.YELLOW}$ Source ')
+if (command_input[-4:] == "xlsx"):
     fileName = command_input.split(' ',1)[1]
-    print(Fore.GREEN + '' + fileName + " \nThis file will be used to generate the screenshots.")
+    print(
+        f'{Fore.GREEN}{fileName}'
+        + " \nThis file will be used to generate the screenshots."
+    )
+
 else:
     fileName = ""
-    print(Fore.RED +"Type an xlsx file")
+    print(f'{Fore.RED}Type an xlsx file')
 
 targetLoc = Completer()
 # we want to treat '/' as part of a word, so override the delimiters
 readline.set_completer_delims(' \t\n;')
 readline.parse_and_bind("tab: complete")
 readline.set_completer(targetLoc.complete)
-command_input = input(Fore.YELLOW+'$ Target ')
+command_input = input(f'{Fore.YELLOW}$ Target ')
 print(len(command_input))
 if(command_input.split(' ',1)[0] == "savein" and command_input.endswith('\\')): 
     saveHere = command_input.split(' ',1)[1]
@@ -213,29 +212,29 @@ print(Fore.CYAN)
 cur_timestamp = str(datetime.now().strftime('%Y-%m-%d %H.%M.%S'))
 driver = webdriver.Chrome()
 driver.maximize_window()
-school_urls = []
-fileName_screenshots = []
-col_names=[]
 loc = fileName 
-  
-wb = xlrd.open_workbook(loc) 
-sheet = wb.sheet_by_index(0) 
-sheet.cell_value(0, 0) 
-for i in range(sheet.ncols): 
-    col_names.append(sheet.cell_value(0, i).lower()) 
+
+wb = xlrd.open_workbook(loc)
+sheet = wb.sheet_by_index(0)
+sheet.cell_value(0, 0)
+col_names = [sheet.cell_value(0, i).lower() for i in range(sheet.ncols)]
 subs_1 = 'lat'
 subs_2 = 'lon'
-subs_3 = 'id'  
+subs_3 = 'id'
 # using list comprehension  
 # to get string with substring  
 res_1 = [col_names.index(i) for i in col_names if subs_1 in i.lower()][0]
 res_2 = [col_names.index(i) for i in col_names if subs_2 in i.lower()][0]
-res_3 = [col_names.index(i) for i in col_names if subs_3 in i.lower()][0]  
-# printing result  
-print ("All strings with given substring are with index : " + str(res_1) + " " + str(res_2))
+res_3 = [col_names.index(i) for i in col_names if subs_3 in i.lower()][0]
+# printing result
+print(
+    f"All strings with given substring are with index : {str(res_1)} "
+    + str(res_2)
+)
 
-folder = saveHere + "folder_" + cur_timestamp
-print(folder + " $$$$$")
+
+folder = f'{saveHere}folder_{cur_timestamp}'
+print(f'{folder} $$$$$')
 try:
     os.makedirs(folder)
 except OSError:
@@ -243,6 +242,8 @@ except OSError:
 os.chdir(folder)
 
 screenshots_taken = 0
+school_urls = []
+fileName_screenshots = []
 for i in range(sheet.nrows): 
     if(sheet.cell_value(i,res_1)!='' and sheet.cell_value(i,res_2)!='' and sheet.cell_value(i,res_1)!='lat' and sheet.cell_value(i,res_2)!='lon' ):
         print('\r')
@@ -257,7 +258,11 @@ for i in range(sheet.nrows):
         print(str(screenshots_taken*100/(sheet.nrows-1)) + " % complete")
 
 end_time = timeit.timeit()
-print(str(screenshots_taken) + " screenshots generated in " + str(screenshots_taken * 10) + " seconds")
+print(
+    f'{screenshots_taken} screenshots generated in '
+    + str(screenshots_taken * 10)
+    + " seconds"
+)
  
 
 
